@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
+import { useSession } from "@/providers/SessionContext";
 import EditModal from "./EditModal";
 import JokeWindowControls from "./JokeWindowControls";
 import {
@@ -19,6 +20,7 @@ export default function JokeCard() {
   const [isEditing, setIsEditing] = useState(false);
   const { mutate } = useVoteMutation();
   const { mutate: deleteJoke } = useDeleteJokeMutation(); // Get the delete mutation function
+  const { voteHistory, voteForJoke, setCurrentJokeId } = useSession();
 
   // Fetch random joke from API
   const { data: joke, error, isLoading, refetch } = useJoke();
@@ -27,13 +29,22 @@ export default function JokeCard() {
   useEffect(() => {
     if (joke) {
       setLocalJoke(joke);
+      setCurrentJokeId(joke._id);
     }
   }, [joke]);
 
+  const hasVoted = (emoji: string): boolean => {
+    return voteHistory[joke._id]?.[emoji] || false;
+  };
+
   // Handle voting on a joke and optimistic UI updates
   const handleVote = (id: string, label: string) => {
-    if (!localJoke) return;
+    if (!localJoke || hasVoted(label)) return;
 
+    console.log(hasVoted(label));
+
+    //Save the voteData and voteHistory to localStorage to prevent duplicate voting
+    voteForJoke(label, id);
     // Optimistically update local joke state
     setLocalJoke((prevJoke) => {
       if (!prevJoke) return prevJoke; // Ensure prevJoke is not null
@@ -107,7 +118,11 @@ export default function JokeCard() {
             {error ? (
               <ErrorWindow error={error} />
             ) : (
-              <JokeWindow localJoke={localJoke} handleVote={handleVote} />
+              <JokeWindow
+                localJoke={localJoke}
+                handleVote={handleVote}
+                hasVoted={hasVoted}
+              />
             )}
           </div>
         </div>

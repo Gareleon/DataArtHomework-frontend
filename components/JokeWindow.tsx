@@ -4,9 +4,14 @@ import { Button } from "./ui/button";
 interface JokeWindowProps {
   localJoke: Joke | null;
   handleVote: (jokeId: string, vote: string) => void;
+  hasVoted: (vote: string) => boolean;
 }
 
-export default function JokeWindow({ localJoke, handleVote }: JokeWindowProps) {
+export default function JokeWindow({
+  localJoke,
+  handleVote,
+  hasVoted,
+}: JokeWindowProps) {
   return (
     <>
       <p className="font-bold text-lg md:text-xl lg:text-2xl text-gray-800 mb-2 break-words">
@@ -24,6 +29,7 @@ export default function JokeWindow({ localJoke, handleVote }: JokeWindowProps) {
             <Button
               key={vote}
               onClick={() => handleVote(localJoke._id, vote)}
+              aria-disabled={hasVoted(vote)}
               className="flex gap-2 items-center"
             >
               <span className="text-md md:text-lg font-bold">{voteValue}</span>

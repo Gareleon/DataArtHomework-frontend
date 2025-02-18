@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "@/providers/SessionContext";
 import EditModal from "./EditModal";
 import JokeWindowControls from "./JokeWindowControls";
@@ -106,43 +107,56 @@ export default function JokeCard() {
 
   return (
     <>
-      {/* Joke Container */}
-      <div className="w-full h-full flex flex-col justify-center items-center gap-8">
-        {/* Joke Window */}
-        <div>
-          <JokeWindowControls
-            handleDelete={handleDelete}
-            handleEdit={handleEdit}
-          />
-          <div className="w-full p-4 bg-white rounded-bl-lg rounded-br-lg shadow-lg border border-gray-200 mx-auto sm:p-6 md:max-w-3xl">
-            {error ? (
-              <ErrorWindow error={error} />
-            ) : (
-              <JokeWindow
-                localJoke={localJoke}
-                handleVote={handleVote}
-                hasVoted={hasVoted}
-              />
-            )}
-          </div>
-        </div>
-        {/* Next Joke Button */}
-        <div className="w-full h-1 mt-4 flex justify-center items-center">
-          <Button
-            onClick={() => handleNextJoke()}
-            className="text-lg md:text-xl "
+      <AnimatePresence mode="wait">
+        {localJoke && (
+          <motion.div
+            key={localJoke?._id}
+            initial={{ opacity: 0, x: -50, scale: 0.95 }} // Slightly smaller
+            animate={{ opacity: 1, x: 0, scale: 1 }} // Grow into place
+            exit={{ opacity: 0, x: 50, scale: 0.95 }} // Shrink while exiting
+            transition={{ duration: 0.5, ease: "easeOut", bounce: 0.3 }}
+            className="w-full h-full"
           >
-            Next Joke
-          </Button>
-        </div>
-      </div>
-      {/* Edit Modal */}
-      <EditModal
-        localJoke={localJoke}
-        setLocalJoke={setLocalJoke}
-        isEditing={isEditing}
-        setIsEditing={setIsEditing}
-      />
+            {/* Joke Container */}
+            <div className="w-full h-full flex flex-col justify-center items-center gap-8">
+              {/* Joke Window */}
+              <div>
+                <JokeWindowControls
+                  handleDelete={handleDelete}
+                  handleEdit={handleEdit}
+                />
+                <div className="w-full p-4 bg-white rounded-bl-lg rounded-br-lg shadow-lg border border-gray-200 mx-auto sm:p-6 md:max-w-3xl">
+                  {error ? (
+                    <ErrorWindow error={error} />
+                  ) : (
+                    <JokeWindow
+                      localJoke={localJoke}
+                      handleVote={handleVote}
+                      hasVoted={hasVoted}
+                    />
+                  )}
+                </div>
+              </div>
+              {/* Next Joke Button */}
+              <div className="w-full h-1 mt-4 flex justify-center items-center">
+                <Button
+                  onClick={() => handleNextJoke()}
+                  className="text-lg md:text-xl "
+                >
+                  Next Joke
+                </Button>
+              </div>
+            </div>
+            {/* Edit Modal */}
+            <EditModal
+              localJoke={localJoke}
+              setLocalJoke={setLocalJoke}
+              isEditing={isEditing}
+              setIsEditing={setIsEditing}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -1,1 +1,1 @@
-export const baseURL = "https://data-art-homework-backend.vercel.app";
+export const baseURL = "https://da-homework-jsbackend.vercel.app";
